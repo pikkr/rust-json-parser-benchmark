@@ -1,6 +1,9 @@
 [package]
-name = "rust-json-parser-benchmark"
+name = "rjpb"
 version = "0.1.0"
 authors = ["Keiji Yoshida <kjmrknsn@gmail.com>"]
 
 [dependencies]
+json = "0.11.9"
+pikkr = "0.2.2"
+serde_json = "1.0.2"
