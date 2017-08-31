@@ -1,5 +1,4 @@
 #![feature(fn_must_use)]
-
 extern crate json;
 extern crate pikkr;
 extern crate serde_json;
@@ -22,10 +21,10 @@ impl Parser for JsonParser {
         let mut qs = Vec::new();
         for q in queries {
             let mut b = false;
-            for i in 0..q.len() {
+            for i in 2..q.len() {
                 if q[i] == 0x2e {
                     qs.push(vec![
-                        String::from_utf8(q.get(0..i).unwrap().to_vec()).unwrap(),
+                        String::from_utf8(q.get(2..i).unwrap().to_vec()).unwrap(),
                         String::from_utf8(q.get(i+1..q.len()).unwrap().to_vec()).unwrap(),
                     ]);
                     b = true;
@@ -35,7 +34,7 @@ impl Parser for JsonParser {
             if b {
                 continue;
             }
-            qs.push(vec![String::from_utf8(q.to_vec()).unwrap()]);
+            qs.push(vec![String::from_utf8(q.get(2..q.len()).unwrap().to_vec()).unwrap()]);
         }
         let mut r = 0;
         let now = Instant::now();
@@ -84,10 +83,10 @@ impl Parser for SerdeJsonParser {
         let mut qs = Vec::new();
         for q in queries {
             let mut b = false;
-            for i in 0..q.len() {
+            for i in 2..q.len() {
                 if q[i] == 0x2e {
                     qs.push(vec![
-                        String::from_utf8(q.get(0..i).unwrap().to_vec()).unwrap(),
+                        String::from_utf8(q.get(2..i).unwrap().to_vec()).unwrap(),
                         String::from_utf8(q.get(i+1..q.len()).unwrap().to_vec()).unwrap(),
                     ]);
                     b = true;
@@ -97,7 +96,7 @@ impl Parser for SerdeJsonParser {
             if b {
                 continue;
             }
-            qs.push(vec![String::from_utf8(q.to_vec()).unwrap()]);
+            qs.push(vec![String::from_utf8(q.get(2..q.len()).unwrap().to_vec()).unwrap()]);
         }
         let mut r = 0;
         let now = Instant::now();
