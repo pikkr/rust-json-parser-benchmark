@@ -8,15 +8,16 @@ use std::io::BufRead;
 use std::io::BufReader;
 use std::ops::{AddAssign, Div};
 use std::time::{Duration, Instant};
+use std::collections::HashMap;
 
 trait Parser: Sized {
-    fn parse(&self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration);
+    fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration);
 }
 
 struct JsonParser {}
 
 impl Parser for JsonParser {
-    fn parse(&self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
+    fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
         let s = &String::from_utf8(rec.to_vec()).unwrap();
         let mut qs = Vec::new();
         for q in queries {
@@ -55,15 +56,15 @@ impl Parser for JsonParser {
     }
 }
 
-struct PikkrParser {
-    pikkr: pikkr::pikkr::Pikkr,
+struct PikkrParser<'a> {
+    pikkr: pikkr::pikkr::Pikkr<'a>,
 }
 
-impl Parser for PikkrParser {
-    fn parse(&self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
+impl<'a> Parser for PikkrParser<'a> {
+    fn parse(&mut self, rec: &[u8], _: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
         let mut r = 0;
         let now = Instant::now();
-        let v = self.pikkr.parse(rec, &queries);
+        let v = self.pikkr.parse(rec);
         for x in v {
             let x = x.unwrap();
             r += x.len();
@@ -79,7 +80,7 @@ impl Parser for PikkrParser {
 struct SerdeJsonParser {}
 
 impl Parser for SerdeJsonParser {
-    fn parse(&self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
+    fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
         let mut qs = Vec::new();
         for q in queries {
             let mut b = false;
@@ -122,6 +123,7 @@ pub struct Executor {
     parser_name: String,
     queries: String,
     print: bool,
+    train_num: usize
 }
 
 impl Executor {
@@ -131,20 +133,31 @@ impl Executor {
             parser_name: args[2].clone(),
             queries: args[3].clone(),
             print: args.len() > 4 && args[4] == "true",
+            train_num: if args.len() > 5 { args[5].parse().unwrap() } else { 1000000000000000000 }
         }
     }
 
     pub fn run(&self) {
-        println!("{}, {}, {} {}", self.file_path, self.parser_name, self.queries, self.print);
-       match self.parser_name.as_ref() {
+        println!("file_path: {}, parser_name: {}, queries: {} print: {} train_num: {}", self.file_path, self.parser_name, self.queries, self.print, self.train_num);
+        match self.parser_name.as_ref() {
            "json" => self.parse(JsonParser {}),
            "serde_json" => self.parse( SerdeJsonParser {}),
-           "pikkr" => self.parse(PikkrParser{pikkr: pikkr::pikkr::Pikkr::new()}),
+           "pikkr" => {
+               let mut query_strs = vec![];
+               for s in self.queries.split(",") {
+                   query_strs.push(s.as_bytes());
+               }
+               let queries = HashMap::new();
+               let stats = HashMap::new();
+               let p = pikkr::pikkr::Pikkr::new(self.train_num, &query_strs, queries, stats);
+               let parser = PikkrParser{pikkr: p};
+               self.parse(parser)
+           },
             _ => (),
         };
     }
 
-    fn parse<T: Parser>(&self, parser: T) {
+    fn parse<T: Parser>(&self, mut parser: T) {
         let f = File::open(&self.file_path).expect("");
         let f = BufReader::new(&f);
         let mut queries = vec![];
