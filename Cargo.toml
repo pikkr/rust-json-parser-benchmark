@@ -1,0 +1,6 @@
+[package]
+name = "rust-json-parser-benchmark"
+version = "0.1.0"
+authors = ["Keiji Yoshida <kjmrknsn@gmail.com>"]
+
+[dependencies]

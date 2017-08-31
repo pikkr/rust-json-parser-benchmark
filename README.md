@@ -1,0 +1,1 @@
+# Rust JSON Parser Benchmark
