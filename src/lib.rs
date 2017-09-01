@@ -2,14 +2,12 @@
 extern crate json;
 extern crate pikkr;
 extern crate serde_json;
-extern crate fnv;
 
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::ops::{AddAssign, Div};
 use std::time::{Duration, Instant};
-use fnv::FnvHashMap;
 
 trait Parser: Sized {
     fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration);
@@ -58,7 +56,7 @@ impl Parser for JsonParser {
 }
 
 struct PikkrParser<'a> {
-    pikkr: pikkr::pikkr::Pikkr<'a>,
+    pikkr: pikkr::Pikkr<'a>,
 }
 
 impl<'a> Parser for PikkrParser<'a> {
@@ -148,9 +146,7 @@ impl Executor {
                for s in self.queries.split(",") {
                    query_strs.push(s.as_bytes());
                }
-               let queries = FnvHashMap::default();
-               let stats = FnvHashMap::default();
-               let p = pikkr::pikkr::Pikkr::new(self.train_num, &query_strs, queries, stats);
+               let p = pikkr::Pikkr::new(&query_strs, self.train_num);
                let parser = PikkrParser{pikkr: p};
                self.parse(parser)
            },
