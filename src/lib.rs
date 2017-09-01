@@ -67,7 +67,7 @@ impl<'a> Parser for PikkrParser<'a> {
         let now = Instant::now();
         let v = self.pikkr.parse(rec);
         for x in v {
-            let x = x.unwrap();
+            let x = unsafe { String::from_utf8_unchecked(x.unwrap().to_vec()) };
             r += x.len();
             if print {
                 println!("{}", x);
