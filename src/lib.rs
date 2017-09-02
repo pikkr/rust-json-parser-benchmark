@@ -1,12 +1,17 @@
 #![feature(fn_must_use)]
 extern crate json;
 extern crate pikkr;
+extern crate serde;
 extern crate serde_json;
+
+mod serde_extract;
+use serde::de::DeserializeSeed;
 
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::ops::{AddAssign, Div};
+use std::str;
 use std::time::{Duration, Instant};
 
 trait Parser: Sized {
@@ -80,39 +85,22 @@ struct SerdeJsonParser {}
 
 impl Parser for SerdeJsonParser {
     fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
-        let mut qs = Vec::new();
+        let mut r = 0;
+        let mut elapsed = Duration::default();
         for q in queries {
-            let mut b = false;
-            for i in 2..q.len() {
-                if q[i] == 0x2e {
-                    qs.push(vec![
-                        String::from_utf8(q.get(2..i).unwrap().to_vec()).unwrap(),
-                        String::from_utf8(q.get(i+1..q.len()).unwrap().to_vec()).unwrap(),
-                    ]);
-                    b = true;
-                    break;
+            let q: Vec<_> = str::from_utf8(&q[2..]).unwrap().split('.').collect();
+            let now = Instant::now();
+            let mut de = serde_json::Deserializer::from_slice(rec);
+            let e = serde_extract::Extract::<&str>::new(&q);
+            let v = e.deserialize(&mut de).unwrap();
+            for x in v {
+                r += x.len();
+                if print {
+                    println!("{}", x);
                 }
             }
-            if b {
-                continue;
-            }
-            qs.push(vec![String::from_utf8(q.get(2..q.len()).unwrap().to_vec()).unwrap()]);
+            elapsed += now.elapsed();
         }
-        let mut r = 0;
-        let now = Instant::now();
-        let v: serde_json::Value = serde_json::from_slice(rec).unwrap();
-        for q in qs {
-            let res = if q.len() == 1 {
-                &v[&q[0]]
-            } else {
-                &v[&q[0]][&q[1]]
-            }.to_string();
-            r += res.len();
-            if print {
-                println!("{}", res);
-            }
-        }
-        let elapsed = now.elapsed();
         (r, elapsed)
     }
 }
