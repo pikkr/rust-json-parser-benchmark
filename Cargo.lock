@@ -3,7 +3,7 @@ name = "rjpb"
 version = "0.1.0"
 dependencies = [
  "json 0.11.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "pikkr 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pikkr 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -34,7 +34,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "pikkr"
-version = "0.4.5"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "fnv 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -68,7 +68,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum itoa 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "ac17257442c2ed77dbc9fd555cf83c58b0c7f7d0e8f2ae08c0ac05c72842e1f6"
 "checksum json 0.11.9 (registry+https://github.com/rust-lang/crates.io-index)" = "c2b0b20012c690c7f0578893637d3b4b61511e3fe4774389b5e77dd8023bc3e4"
 "checksum num-traits 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)" = "99843c856d68d8b4313b03a17e33c4bb42ae8f6610ea81b28abe076ac721b9b0"
-"checksum pikkr 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)" = "499d6c66f1f20629eed58b2d66538c7d64b4669e017375e2e0eb7fcf6d1f0067"
+"checksum pikkr 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "62ce2f67c9e2e002dc0dd7cd284172ad027f984e08a32ead24d5cada8b181aa5"
 "checksum serde 1.0.11 (registry+https://github.com/rust-lang/crates.io-index)" = "f7726f29ddf9731b17ff113c461e362c381d9d69433f79de4f3dd572488823e9"
 "checksum serde_json 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "48b04779552e92037212c3615370f6bd57a40ebba7f20e554ff9f55e41a69a7b"
 "checksum x86intrin 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "5f65e7a74c19065448f1f36de5100f947c9309244c084ded5594ddf6d588706d"
