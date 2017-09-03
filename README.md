@@ -77,3 +77,11 @@ num: 2105712, size: 8759789136, r: 1211404880, elapsed: Duration { secs: 14, nan
 file_path: work/companies_8g.json, parser_name: pikkr, queries: $._id.$oid,$.partners,$.name,$.external_links,$.permalink,$.screenshots,$.crunchbase_url,$.video_embeds,$.homepage_url,$.blog_url,$.blog_feed_url,$.twitter_username,$.category_code,$.number_of_employees,$.tag_list,$.email_address print: false train_num: 100
 num: 2105712, size: 8759789136, r: 1211404880, elapsed: Duration { secs: 13, nanos: 682013791 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 6496 }
 ```
+
+## Restrictions
+
+* [Rust nightly channel](https://github.com/rust-lang-nursery/rustup.rs/blob/master/README.md#working-with-nightly-rust) and [CPUs with AVX2](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions#CPUs_with_AVX2) are needed to build Rust source code which depends on Pikkr and run the executable binary file because Pikkr uses AVX2 Instructions.
+
+## Contributing
+
+Any kind of contribution (e.g. comment, suggestion, question, bug report and pull request) is welcome.
