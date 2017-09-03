@@ -2,10 +2,10 @@
 extern crate json;
 extern crate pikkr;
 extern crate serde;
+#[cfg_attr(test, macro_use)]
 extern crate serde_json;
 
-mod serde_extract;
-use serde::de::DeserializeSeed;
+mod serde_pikkr;
 
 use std::fs::File;
 use std::io::BufRead;
@@ -81,26 +81,23 @@ impl<'a> Parser for PikkrParser<'a> {
     }
 }
 
-struct SerdeJsonParser {}
+struct SerdeJsonParser<'a> {
+    pikkr: serde_pikkr::Pikkr<'a>,
+}
 
-impl Parser for SerdeJsonParser {
-    fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
+impl<'a> Parser for SerdeJsonParser<'a> {
+    fn parse(&mut self, rec: &[u8], _: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
         let mut r = 0;
-        let mut elapsed = Duration::default();
-        for q in queries {
-            let q: Vec<_> = str::from_utf8(&q[2..]).unwrap().split('.').collect();
-            let now = Instant::now();
-            let mut de = serde_json::Deserializer::from_slice(rec);
-            let e = serde_extract::Extract::<&str>::new(&q);
-            let v = e.deserialize(&mut de).unwrap();
-            for x in v {
-                r += x.len();
-                if print {
-                    println!("{}", x);
-                }
+        let now = Instant::now();
+        let v = self.pikkr.parse(rec);
+        for x in v {
+            let x = x.unwrap();
+            r += x.to_string().len();
+            if print {
+                println!("{}", x);
             }
-            elapsed += now.elapsed();
         }
+        let elapsed = now.elapsed();
         (r, elapsed)
     }
 }
@@ -128,7 +125,11 @@ impl Executor {
         println!("file_path: {}, parser_name: {}, queries: {} print: {} train_num: {}", self.file_path, self.parser_name, self.queries, self.print, self.train_num);
         match self.parser_name.as_ref() {
            "json" => self.parse(JsonParser {}),
-           "serde_json" => self.parse( SerdeJsonParser {}),
+           "serde_json" => {
+               let queries: Vec<_> = self.queries.split(",").collect();
+               let p = serde_pikkr::Pikkr::new(&queries);
+               self.parse(SerdeJsonParser { pikkr: p })
+           }
            "pikkr" => {
                let mut query_strs = vec![];
                for s in self.queries.split(",") {
