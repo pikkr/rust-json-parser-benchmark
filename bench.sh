@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 FILE=work/companies_8g.json
 PRINT=false
