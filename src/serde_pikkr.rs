@@ -1,4 +1,6 @@
-use std::collections::BTreeMap as Map;
+extern crate linear_map;
+
+use self::linear_map::LinearMap as Map;
 use std::{fmt, str};
 use serde::de::{DeserializeSeed, Deserializer, Visitor, MapAccess, IgnoredAny, Error};
 use serde_json::{self, Value};
