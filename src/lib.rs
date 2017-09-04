@@ -149,7 +149,7 @@ impl Executor {
                for s in self.queries.split(",") {
                    query_strs.push(s.as_bytes());
                }
-               let p = pikkr::Pikkr::new(&query_strs, self.train_num);
+               let p = pikkr::Pikkr::new(&query_strs, self.train_num).unwrap();
                let parser = PikkrParser{pikkr: p};
                self.parse(parser)
            },
