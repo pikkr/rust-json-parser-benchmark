@@ -79,7 +79,7 @@ struct PikkrParser<'a> {
 impl<'a> Parser for PikkrParser<'a> {
     fn parse(&mut self, rec: &[u8], _: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
         stopwatch(|| {
-            let v = self.pikkr.parse(rec);
+            let v = self.pikkr.parse(rec).unwrap();
   
             let mut r = 0;
             for x in v {
