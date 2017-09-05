@@ -177,6 +177,6 @@ impl Executor {
             r += res.0;
             elapsed.add_assign(res.1);
         }
-        println!("num: {}, size: {}, r: {}, elapsed: {:?}, average size: {}, average elapsed: {:?}", num, size, r, elapsed, size / num, elapsed.div(num as u32));
+        println!("num: {}, size: {}, r: {}, elapsed: {:?}, average size: {}, average elapsed: {:?}, throughput (mb/sec): {:.4}", num, size, r, elapsed, size / num, elapsed.div(num as u32), (size as f64 / (elapsed.as_secs() as f64 + (elapsed.subsec_nanos() as u64 as f64) / 1000000000f64) / 1024f64 / 1024f64));
     }
 }

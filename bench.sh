@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-FILE=work/companies_8g.json
+FILE=work/companies_1g.json
 PRINT=false
 TRAIN_NUM=100
 
