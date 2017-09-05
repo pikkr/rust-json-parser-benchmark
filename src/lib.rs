@@ -39,8 +39,8 @@ impl Parser for JsonParser {
             for i in 2..q.len() {
                 if q[i] == 0x2e {
                     qs.push(vec![
-                        str::from_utf8(q.get(2..i).unwrap()).unwrap(),
-                        str::from_utf8(q.get(i+1..q.len()).unwrap()).unwrap(),
+                        str::from_utf8(&q[2..i]).unwrap(),
+                        str::from_utf8(&q[i+1..q.len()]).unwrap(),
                     ]);
                     b = true;
                     break;
@@ -49,7 +49,7 @@ impl Parser for JsonParser {
             if b {
                 continue;
             }
-            qs.push(vec![str::from_utf8(q.get(2..q.len()).unwrap()).unwrap()]);
+            qs.push(vec![str::from_utf8(&q[2..q.len()]).unwrap()]);
         }
 
         stopwatch(|| {
