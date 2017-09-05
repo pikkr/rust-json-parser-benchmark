@@ -33,15 +33,15 @@ struct JsonParser<'q> {
 }
 
 impl<'q> JsonParser<'q> {
-    fn new(queries: &'q str) -> Self {
+    fn new(queries: &[&'q str]) -> Result<Self, str::Utf8Error> {
         let mut qs = Vec::new();
-        for q in queries.split(",").map(str::as_bytes) {
+        for q in queries.into_iter().map(|s| s.as_bytes()) {
             let mut b = false;
             for i in 2..q.len() {
                 if q[i] == 0x2e {
                     qs.push(vec![
-                        str::from_utf8(&q[2..i]).unwrap(),
-                        str::from_utf8(&q[i+1..q.len()]).unwrap(),
+                        str::from_utf8(&q[2..i])?,
+                        str::from_utf8(&q[i+1..q.len()])?,
                     ]);
                     b = true;
                     break;
@@ -50,12 +50,12 @@ impl<'q> JsonParser<'q> {
             if b {
                 continue;
             }
-            qs.push(vec![str::from_utf8(&q[2..q.len()]).unwrap()]);
+            qs.push(vec![str::from_utf8(&q[2..q.len()])?]);
         }
 
-        Self {
+        Ok(Self {
             queries: qs,
-        }
+        })
     }
 }
 
@@ -142,7 +142,8 @@ impl Executor {
         println!("file_path: {}, parser_name: {}, queries: {} print: {} train_num: {}", self.file_path, self.parser_name, self.queries, self.print, self.train_num);
         match self.parser_name.as_ref() {
            "json" => {
-               let parser = JsonParser::new(&self.queries);
+               let queries: Vec<_> = self.queries.split(",").collect();
+               let parser = JsonParser::new(&queries).expect("failed to construct queries");
                self.parse(parser)
            },
            "serde_json" => {
@@ -151,11 +152,8 @@ impl Executor {
                self.parse(SerdeJsonParser { pikkr: p })
            }
            "pikkr" => {
-               let mut query_strs = vec![];
-               for s in self.queries.split(",") {
-                   query_strs.push(s.as_bytes());
-               }
-               let p = pikkr::Pikkr::new(&query_strs, self.train_num).unwrap();
+               let queries: Vec<_> = self.queries.split(",").map(str::as_bytes).collect();
+               let p = pikkr::Pikkr::new(&queries, self.train_num).unwrap();
                let parser = PikkrParser{pikkr: p};
                self.parse(parser)
            },
