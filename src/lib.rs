@@ -28,13 +28,14 @@ trait Parser: Sized {
     fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration);
 }
 
-struct JsonParser {}
+struct JsonParser<'q> {
+    queries: Vec<Vec<&'q str>>,
+}
 
-impl Parser for JsonParser {
-    fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
-        let s = str::from_utf8(rec).unwrap();
+impl<'q> JsonParser<'q> {
+    fn new(queries: &'q str) -> Self {
         let mut qs = Vec::new();
-        for q in queries {
+        for q in queries.split(",").map(str::as_bytes) {
             let mut b = false;
             for i in 2..q.len() {
                 if q[i] == 0x2e {
@@ -52,11 +53,20 @@ impl Parser for JsonParser {
             qs.push(vec![str::from_utf8(&q[2..q.len()]).unwrap()]);
         }
 
+        Self {
+            queries: qs,
+        }
+    }
+}
+
+impl<'q> Parser for JsonParser<'q> {
+    fn parse(&mut self, rec: &[u8], _: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
+        let s = str::from_utf8(rec).unwrap();
         stopwatch(|| {
             let v = json::parse(s).unwrap();
 
             let mut r = 0;
-            for q in qs {
+            for q in &self.queries {
                 let res = if q.len() == 1 {
                     &v[q[0]]
                 } else {
@@ -138,7 +148,10 @@ impl Executor {
     pub fn run(&self) {
         println!("file_path: {}, parser_name: {}, queries: {} print: {} train_num: {}", self.file_path, self.parser_name, self.queries, self.print, self.train_num);
         match self.parser_name.as_ref() {
-           "json" => self.parse(JsonParser {}),
+           "json" => {
+               let parser = JsonParser::new(&self.queries);
+               self.parse(parser)
+           },
            "serde_json" => {
                let queries: Vec<_> = self.queries.split(",").collect();
                let p = serde_pikkr::Pikkr::new(&queries);
@@ -160,10 +173,6 @@ impl Executor {
     fn parse<T: Parser>(&self, mut parser: T) {
         let f = File::open(&self.file_path).expect("");
         let f = BufReader::new(&f);
-        let mut queries = vec![];
-        for s in self.queries.split(",") {
-            queries.push(s.as_bytes());
-        }
         let mut num = 0;
         let mut size = 0;
         let mut r = 0;
@@ -171,7 +180,7 @@ impl Executor {
         for (_, l) in f.lines().enumerate() {
             let l = l.unwrap();
             let b = l.as_bytes();
-            let res = parser.parse(b, &queries, self.print);
+            let res = parser.parse(b, &vec![], self.print);
             num += 1;
             size += b.len();
             r += res.0;
