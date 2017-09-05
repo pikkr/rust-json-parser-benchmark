@@ -32,15 +32,15 @@ struct JsonParser {}
 
 impl Parser for JsonParser {
     fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
-        let s = &String::from_utf8(rec.to_vec()).unwrap();
+        let s = str::from_utf8(rec).unwrap();
         let mut qs = Vec::new();
         for q in queries {
             let mut b = false;
             for i in 2..q.len() {
                 if q[i] == 0x2e {
                     qs.push(vec![
-                        String::from_utf8(q.get(2..i).unwrap().to_vec()).unwrap(),
-                        String::from_utf8(q.get(i+1..q.len()).unwrap().to_vec()).unwrap(),
+                        str::from_utf8(q.get(2..i).unwrap()).unwrap(),
+                        str::from_utf8(q.get(i+1..q.len()).unwrap()).unwrap(),
                     ]);
                     b = true;
                     break;
@@ -49,7 +49,7 @@ impl Parser for JsonParser {
             if b {
                 continue;
             }
-            qs.push(vec![String::from_utf8(q.get(2..q.len()).unwrap().to_vec()).unwrap()]);
+            qs.push(vec![str::from_utf8(q.get(2..q.len()).unwrap()).unwrap()]);
         }
 
         stopwatch(|| {
@@ -58,9 +58,9 @@ impl Parser for JsonParser {
             let mut r = 0;
             for q in qs {
                 let res = if q.len() == 1 {
-                    &v[&q[0]]
+                    &v[q[0]]
                 } else {
-                    &v[&q[0]][&q[1]]
+                    &v[q[0]][q[1]]
                 }.to_string();
                 r += res.len();
                 if print {
@@ -83,7 +83,7 @@ impl<'a> Parser for PikkrParser<'a> {
   
             let mut r = 0;
             for x in v {
-                let x = unsafe { String::from_utf8_unchecked(x.unwrap().to_vec()) };
+                let x = unsafe { str::from_utf8_unchecked(x.unwrap()) };
                 r += x.len();
                 if print {
                     println!("{}", x);
