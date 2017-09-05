@@ -25,7 +25,7 @@ where F: FnOnce() -> T
 }
 
 trait Parser: Sized {
-    fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration);
+    fn parse(&mut self, rec: &str, print: bool) -> usize;
 }
 
 struct JsonParser<'q> {
@@ -60,25 +60,22 @@ impl<'q> JsonParser<'q> {
 }
 
 impl<'q> Parser for JsonParser<'q> {
-    fn parse(&mut self, rec: &[u8], _: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
-        let s = str::from_utf8(rec).unwrap();
-        stopwatch(|| {
-            let v = json::parse(s).unwrap();
+    fn parse(&mut self, rec: &str, print: bool) -> usize {
+        let v = json::parse(rec).unwrap();
 
-            let mut r = 0;
-            for q in &self.queries {
-                let res = if q.len() == 1 {
-                    &v[q[0]]
-                } else {
-                    &v[q[0]][q[1]]
-                }.to_string();
-                r += res.len();
-                if print {
-                    println!("{}", res);
-                }
+        let mut r = 0;
+        for q in &self.queries {
+            let res = if q.len() == 1 {
+                &v[q[0]]
+            } else {
+                &v[q[0]][q[1]]
+            }.to_string();
+            r += res.len();
+            if print {
+                println!("{}", res);
             }
-            r
-        })
+        }
+        r
     }
 }
 
@@ -87,20 +84,18 @@ struct PikkrParser<'a> {
 }
 
 impl<'a> Parser for PikkrParser<'a> {
-    fn parse(&mut self, rec: &[u8], _: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
-        stopwatch(|| {
-            let v = self.pikkr.parse(rec).unwrap();
-  
-            let mut r = 0;
-            for x in v {
-                let x = unsafe { str::from_utf8_unchecked(x.unwrap()) };
-                r += x.len();
-                if print {
-                    println!("{}", x);
-                }
+    fn parse(&mut self, rec: &str, print: bool) -> usize {
+        let v = self.pikkr.parse(rec.as_bytes()).unwrap();
+
+        let mut r = 0;
+        for x in v {
+            let x = unsafe { str::from_utf8_unchecked(x.unwrap()) };
+            r += x.len();
+            if print {
+                println!("{}", x);
             }
-            r
-        })
+        }
+        r
     }
 }
 
@@ -109,20 +104,18 @@ struct SerdeJsonParser<'a> {
 }
 
 impl<'a> Parser for SerdeJsonParser<'a> {
-    fn parse(&mut self, rec: &[u8], _: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
-        stopwatch(|| {
-            let v = self.pikkr.parse(rec);
+    fn parse(&mut self, rec: &str, print: bool) -> usize {
+        let v = self.pikkr.parse(rec.as_bytes());
 
-            let mut r = 0;
-            for x in v {
-                let x = x.unwrap();
-                r += x.to_string().len();
-                if print {
-                    println!("{}", x);
-                }
+        let mut r = 0;
+        for x in v {
+            let x = x.unwrap();
+            r += x.to_string().len();
+            if print {
+                println!("{}", x);
             }
-            r
-        })
+        }
+        r
     }
 }
 
@@ -179,10 +172,9 @@ impl Executor {
         let mut elapsed = Duration::new(0, 0);
         for (_, l) in f.lines().enumerate() {
             let l = l.unwrap();
-            let b = l.as_bytes();
-            let res = parser.parse(b, &vec![], self.print);
+            let res = stopwatch(|| parser.parse(&l, self.print));
             num += 1;
-            size += b.len();
+            size += l.len();
             r += res.0;
             elapsed.add_assign(res.1);
         }
