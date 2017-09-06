@@ -24,7 +24,7 @@ where F: FnOnce() -> T
     (r, elapsed)
 }
 
-trait Parser: Sized {
+trait Parser {
     fn parse(&mut self, rec: &str, print: bool) -> usize;
 }
 
