@@ -24,23 +24,24 @@ where F: FnOnce() -> T
     (r, elapsed)
 }
 
-trait Parser: Sized {
-    fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration);
+trait Parser {
+    fn parse(&mut self, rec: &str, print: bool) -> usize;
 }
 
-struct JsonParser {}
+struct JsonParser<'q> {
+    queries: Vec<Vec<&'q str>>,
+}
 
-impl Parser for JsonParser {
-    fn parse(&mut self, rec: &[u8], queries: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
-        let s = str::from_utf8(rec).unwrap();
+impl<'q> JsonParser<'q> {
+    fn new(queries: &[&'q str]) -> Result<Self, str::Utf8Error> {
         let mut qs = Vec::new();
-        for q in queries {
+        for q in queries.into_iter().map(|s| s.as_bytes()) {
             let mut b = false;
             for i in 2..q.len() {
                 if q[i] == 0x2e {
                     qs.push(vec![
-                        str::from_utf8(&q[2..i]).unwrap(),
-                        str::from_utf8(&q[i+1..q.len()]).unwrap(),
+                        str::from_utf8(&q[2..i])?,
+                        str::from_utf8(&q[i+1..q.len()])?,
                     ]);
                     b = true;
                     break;
@@ -49,26 +50,32 @@ impl Parser for JsonParser {
             if b {
                 continue;
             }
-            qs.push(vec![str::from_utf8(&q[2..q.len()]).unwrap()]);
+            qs.push(vec![str::from_utf8(&q[2..q.len()])?]);
         }
 
-        stopwatch(|| {
-            let v = json::parse(s).unwrap();
-
-            let mut r = 0;
-            for q in qs {
-                let res = if q.len() == 1 {
-                    &v[q[0]]
-                } else {
-                    &v[q[0]][q[1]]
-                }.to_string();
-                r += res.len();
-                if print {
-                    println!("{}", res);
-                }
-            }
-            r
+        Ok(Self {
+            queries: qs,
         })
+    }
+}
+
+impl<'q> Parser for JsonParser<'q> {
+    fn parse(&mut self, rec: &str, print: bool) -> usize {
+        let v = json::parse(rec).unwrap();
+
+        let mut r = 0;
+        for q in &self.queries {
+            let res = if q.len() == 1 {
+                &v[q[0]]
+            } else {
+                &v[q[0]][q[1]]
+            }.to_string();
+            r += res.len();
+            if print {
+                println!("{}", res);
+            }
+        }
+        r
     }
 }
 
@@ -77,20 +84,18 @@ struct PikkrParser<'a> {
 }
 
 impl<'a> Parser for PikkrParser<'a> {
-    fn parse(&mut self, rec: &[u8], _: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
-        stopwatch(|| {
-            let v = self.pikkr.parse(rec).unwrap();
-  
-            let mut r = 0;
-            for x in v {
-                let x = unsafe { str::from_utf8_unchecked(x.unwrap()) };
-                r += x.len();
-                if print {
-                    println!("{}", x);
-                }
+    fn parse(&mut self, rec: &str, print: bool) -> usize {
+        let v = self.pikkr.parse(rec.as_bytes()).unwrap();
+
+        let mut r = 0;
+        for x in v {
+            let x = unsafe { str::from_utf8_unchecked(x.unwrap()) };
+            r += x.len();
+            if print {
+                println!("{}", x);
             }
-            r
-        })
+        }
+        r
     }
 }
 
@@ -99,20 +104,18 @@ struct SerdeJsonParser<'a> {
 }
 
 impl<'a> Parser for SerdeJsonParser<'a> {
-    fn parse(&mut self, rec: &[u8], _: &Vec<&[u8]>, print: bool) -> (usize, Duration) {
-        stopwatch(|| {
-            let v = self.pikkr.parse(rec);
+    fn parse(&mut self, rec: &str, print: bool) -> usize {
+        let v = self.pikkr.parse(rec.as_bytes());
 
-            let mut r = 0;
-            for x in v {
-                let x = x.unwrap();
-                r += x.to_string().len();
-                if print {
-                    println!("{}", x);
-                }
+        let mut r = 0;
+        for x in v {
+            let x = x.unwrap();
+            r += x.to_string().len();
+            if print {
+                println!("{}", x);
             }
-            r
-        })
+        }
+        r
     }
 }
 
@@ -138,18 +141,19 @@ impl Executor {
     pub fn run(&self) {
         println!("file_path: {}, parser_name: {}, queries: {} print: {} train_num: {}", self.file_path, self.parser_name, self.queries, self.print, self.train_num);
         match self.parser_name.as_ref() {
-           "json" => self.parse(JsonParser {}),
+           "json" => {
+               let queries: Vec<_> = self.queries.split(",").collect();
+               let parser = JsonParser::new(&queries).expect("failed to construct queries");
+               self.parse(parser)
+           },
            "serde_json" => {
                let queries: Vec<_> = self.queries.split(",").collect();
                let p = serde_pikkr::Pikkr::new(&queries);
                self.parse(SerdeJsonParser { pikkr: p })
            }
            "pikkr" => {
-               let mut query_strs = vec![];
-               for s in self.queries.split(",") {
-                   query_strs.push(s.as_bytes());
-               }
-               let p = pikkr::Pikkr::new(&query_strs, self.train_num).unwrap();
+               let queries: Vec<_> = self.queries.split(",").map(str::as_bytes).collect();
+               let p = pikkr::Pikkr::new(&queries, self.train_num).unwrap();
                let parser = PikkrParser{pikkr: p};
                self.parse(parser)
            },
@@ -160,20 +164,15 @@ impl Executor {
     fn parse<T: Parser>(&self, mut parser: T) {
         let f = File::open(&self.file_path).expect("");
         let f = BufReader::new(&f);
-        let mut queries = vec![];
-        for s in self.queries.split(",") {
-            queries.push(s.as_bytes());
-        }
         let mut num = 0;
         let mut size = 0;
         let mut r = 0;
         let mut elapsed = Duration::new(0, 0);
         for (_, l) in f.lines().enumerate() {
             let l = l.unwrap();
-            let b = l.as_bytes();
-            let res = parser.parse(b, &queries, self.print);
+            let res = stopwatch(|| parser.parse(&l, self.print));
             num += 1;
-            size += b.len();
+            size += l.len();
             r += res.0;
             elapsed.add_assign(res.1);
         }
