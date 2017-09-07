@@ -29,53 +29,53 @@ build
 
 number of queries = 1
 file_path: work/companies_1g.json, parser_name: serde_json, queries: $._id.$oid print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 6843564, elapsed: Duration { secs: 2, nanos: 391130128 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 9083 }, throughput (mb/sec): 436.7174
+num: 263214, size: 1094973642, r: 6843564, elapsed: Duration { secs: 2, nanos: 487382750 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 9449 }, throughput (mb/sec): 419.8181
 file_path: work/companies_1g.json, parser_name: json, queries: $._id.$oid print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 6317136, elapsed: Duration { secs: 4, nanos: 53974620 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 15401 }, throughput (mb/sec): 257.5863
+num: 263214, size: 1094973642, r: 6317136, elapsed: Duration { secs: 4, nanos: 190898966 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 15921 }, throughput (mb/sec): 249.1705
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 6843564, elapsed: Duration { secs: 1, nanos: 338023009 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 5083 }, throughput (mb/sec): 780.4412
+num: 263214, size: 1094973642, r: 6843564, elapsed: Duration { secs: 1, nanos: 313350620 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 4989 }, throughput (mb/sec): 795.1024
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid print: false train_num: 100
-num: 263214, size: 1094973642, r: 6843564, elapsed: Duration { secs: 0, nanos: 920931203 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 3498 }, throughput (mb/sec): 1133.9047
+num: 263214, size: 1094973642, r: 6843564, elapsed: Duration { secs: 0, nanos: 903027576 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 3430 }, throughput (mb/sec): 1156.3858
 
 number of queries = 2
 file_path: work/companies_1g.json, parser_name: serde_json, queries: $._id.$oid,$.partners print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 8144696, elapsed: Duration { secs: 2, nanos: 511694041 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 9542 }, throughput (mb/sec): 415.7546
+num: 263214, size: 1094973642, r: 8144696, elapsed: Duration { secs: 2, nanos: 585043423 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 9820 }, throughput (mb/sec): 403.9577
 file_path: work/companies_1g.json, parser_name: json, queries: $._id.$oid,$.partners print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 7618268, elapsed: Duration { secs: 4, nanos: 22914539 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 15283 }, throughput (mb/sec): 259.5750
+num: 263214, size: 1094973642, r: 7618268, elapsed: Duration { secs: 4, nanos: 246430355 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 16132 }, throughput (mb/sec): 245.9120
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid,$.partners print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 8206912, elapsed: Duration { secs: 1, nanos: 349802006 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 5127 }, throughput (mb/sec): 773.6307
+num: 263214, size: 1094973642, r: 8206912, elapsed: Duration { secs: 1, nanos: 348329119 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 5122 }, throughput (mb/sec): 774.4758
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid,$.partners print: false train_num: 100
-num: 263214, size: 1094973642, r: 8206912, elapsed: Duration { secs: 0, nanos: 961032882 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 3651 }, throughput (mb/sec): 1086.5895
+num: 263214, size: 1094973642, r: 8206912, elapsed: Duration { secs: 0, nanos: 944867480 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 3589 }, throughput (mb/sec): 1105.1796
 
 number of queries = 4
 file_path: work/companies_1g.json, parser_name: serde_json, queries: $._id.$oid,$.partners,$.name,$.external_links print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 33848920, elapsed: Duration { secs: 2, nanos: 901478290 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 11022 }, throughput (mb/sec): 359.9021
+num: 263214, size: 1094973642, r: 33848920, elapsed: Duration { secs: 3, nanos: 102237124 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 11785 }, throughput (mb/sec): 336.6114
 file_path: work/companies_1g.json, parser_name: json, queries: $._id.$oid,$.partners,$.name,$.external_links print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 32796064, elapsed: Duration { secs: 4, nanos: 166544962 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 15828 }, throughput (mb/sec): 250.6269
+num: 263214, size: 1094973642, r: 7618268, elapsed: Duration { secs: 4, nanos: 262629995 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 16193 }, throughput (mb/sec): 244.9775
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid,$.partners,$.name,$.external_links print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 35287798, elapsed: Duration { secs: 1, nanos: 467392044 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 5574 }, throughput (mb/sec): 711.6355
+num: 263214, size: 1094973642, r: 35287798, elapsed: Duration { secs: 1, nanos: 359750708 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 5165 }, throughput (mb/sec): 767.9704
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid,$.partners,$.name,$.external_links print: false train_num: 100
-num: 263214, size: 1094973642, r: 35287798, elapsed: Duration { secs: 1, nanos: 56213141 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 4012 }, throughput (mb/sec): 988.6719
+num: 263214, size: 1094973642, r: 35287798, elapsed: Duration { secs: 0, nanos: 954944285 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 3628 }, throughput (mb/sec): 1093.5175
 
 number of queries = 8
 file_path: work/companies_1g.json, parser_name: serde_json, queries: $._id.$oid,$.partners,$.name,$.external_links,$.permalink,$.screenshots,$.crunchbase_url,$.video_embeds print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 110592552, elapsed: Duration { secs: 4, nanos: 2885542 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 15206 }, throughput (mb/sec): 260.8739
+num: 263214, size: 1094973642, r: 110592552, elapsed: Duration { secs: 4, nanos: 155873814 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 15788 }, throughput (mb/sec): 251.2704
 file_path: work/companies_1g.json, parser_name: json, queries: $._id.$oid,$.partners,$.name,$.external_links,$.permalink,$.screenshots,$.crunchbase_url,$.video_embeds print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 108486840, elapsed: Duration { secs: 4, nanos: 419092881 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 16788 }, throughput (mb/sec): 236.3038
+num: 263214, size: 1094973642, r: 108486840, elapsed: Duration { secs: 4, nanos: 603804594 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 17489 }, throughput (mb/sec): 226.8229
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid,$.partners,$.name,$.external_links,$.permalink,$.screenshots,$.crunchbase_url,$.video_embeds print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 117254690, elapsed: Duration { secs: 1, nanos: 515637599 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 5758 }, throughput (mb/sec): 688.9828
+num: 263214, size: 1094973642, r: 117254690, elapsed: Duration { secs: 1, nanos: 422790170 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 5405 }, throughput (mb/sec): 733.9440
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid,$.partners,$.name,$.external_links,$.permalink,$.screenshots,$.crunchbase_url,$.video_embeds print: false train_num: 100
-num: 263214, size: 1094973642, r: 117254690, elapsed: Duration { secs: 1, nanos: 154608203 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 4386 }, throughput (mb/sec): 904.4178
+num: 263214, size: 1094973642, r: 117254690, elapsed: Duration { secs: 1, nanos: 41323593 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 3955 }, throughput (mb/sec): 1002.8086
 
 number of queries = 16
 file_path: work/companies_1g.json, parser_name: serde_json, queries: $._id.$oid,$.partners,$.name,$.external_links,$.permalink,$.screenshots,$.crunchbase_url,$.video_embeds,$.homepage_url,$.blog_url,$.blog_feed_url,$.twitter_username,$.category_code,$.number_of_employees,$.tag_list,$.email_address print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 144763472, elapsed: Duration { secs: 4, nanos: 669006082 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 17737 }, throughput (mb/sec): 223.6554
+num: 263214, size: 1094973642, r: 144763472, elapsed: Duration { secs: 4, nanos: 936942649 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 18755 }, throughput (mb/sec): 211.5172
 file_path: work/companies_1g.json, parser_name: json, queries: $._id.$oid,$.partners,$.name,$.external_links,$.permalink,$.screenshots,$.crunchbase_url,$.video_embeds,$.homepage_url,$.blog_url,$.blog_feed_url,$.twitter_username,$.category_code,$.number_of_employees,$.tag_list,$.email_address print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 139591312, elapsed: Duration { secs: 4, nanos: 657521116 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 17694 }, throughput (mb/sec): 224.2069
+num: 263214, size: 1094973642, r: 139591312, elapsed: Duration { secs: 5, nanos: 396408453 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 20501 }, throughput (mb/sec): 193.5080
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid,$.partners,$.name,$.external_links,$.permalink,$.screenshots,$.crunchbase_url,$.video_embeds,$.homepage_url,$.blog_url,$.blog_feed_url,$.twitter_username,$.category_code,$.number_of_employees,$.tag_list,$.email_address print: false train_num: 1000000000000000000
-num: 263214, size: 1094973642, r: 151425610, elapsed: Duration { secs: 1, nanos: 666061265 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 6329 }, throughput (mb/sec): 626.7766
+num: 263214, size: 1094973642, r: 151425610, elapsed: Duration { secs: 1, nanos: 481092995 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 5626 }, throughput (mb/sec): 705.0524
 file_path: work/companies_1g.json, parser_name: pikkr, queries: $._id.$oid,$.partners,$.name,$.external_links,$.permalink,$.screenshots,$.crunchbase_url,$.video_embeds,$.homepage_url,$.blog_url,$.blog_feed_url,$.twitter_username,$.category_code,$.number_of_employees,$.tag_list,$.email_address print: false train_num: 100
-num: 263214, size: 1094973642, r: 151425610, elapsed: Duration { secs: 1, nanos: 501947908 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 5705 }, throughput (mb/sec): 695.2626
+num: 263214, size: 1094973642, r: 151425610, elapsed: Duration { secs: 1, nanos: 278426508 }, average size: 4160, average elapsed: Duration { secs: 0, nanos: 4856 }, throughput (mb/sec): 816.8231
 ```
 
 ## Restrictions
