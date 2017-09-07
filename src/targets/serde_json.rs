@@ -1,9 +1,38 @@
+#![cfg_attr(rustfmt, rustfmt_skip)]
+
 extern crate linear_map;
 
 use self::linear_map::LinearMap as Map;
 use std::{fmt, str};
 use serde::de::{DeserializeSeed, Deserializer, Visitor, MapAccess, IgnoredAny, Error};
 use serde_json::{self, Value};
+use super::Parser;
+
+pub struct SerdeJsonParser<'a> {
+    pikkr: Pikkr<'a>,
+}
+
+impl<'a> SerdeJsonParser<'a> {
+    pub fn new(paths: &[&'a str]) -> Self {
+        SerdeJsonParser { pikkr: Pikkr::new(paths) }
+    }
+}
+
+impl<'a> Parser for SerdeJsonParser<'a> {
+    fn parse(&mut self, rec: &str, print: bool) -> usize {
+        let v = self.pikkr.parse(rec.as_bytes());
+
+        let mut r = 0;
+        for x in v {
+            let x = x.unwrap();
+            r += x.to_string().len();
+            if print {
+                println!("{}", x);
+            }
+        }
+        r
+    }
+}
 
 pub struct Pikkr<'a> {
     /// Map of top-level keys that we care about.
