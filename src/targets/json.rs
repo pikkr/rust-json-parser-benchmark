@@ -1,31 +1,17 @@
 use std::str;
-use json;
+use json::{self, JsonValue};
 use super::Parser;
 
 
 pub struct JsonParser<'q> {
-    queries: Vec<Vec<&'q str>>,
+    queries: Vec<Query<'q>>,
 }
 
 impl<'q> JsonParser<'q> {
     pub fn new(queries: &[&'q str]) -> Result<Self, str::Utf8Error> {
         let mut qs = Vec::new();
-        for q in queries.into_iter().map(|s| s.as_bytes()) {
-            let mut b = false;
-            for i in 2..q.len() {
-                if q[i] == 0x2e {
-                    qs.push(vec![
-                        str::from_utf8(&q[2..i])?,
-                        str::from_utf8(&q[i + 1..q.len()])?,
-                    ]);
-                    b = true;
-                    break;
-                }
-            }
-            if b {
-                continue;
-            }
-            qs.push(vec![str::from_utf8(&q[2..q.len()])?]);
+        for q in queries {
+            qs.push(Query::from_slice(q.as_bytes())?);
         }
 
         Ok(Self { queries: qs })
@@ -38,16 +24,54 @@ impl<'q> Parser for JsonParser<'q> {
 
         let mut r = 0;
         for q in &self.queries {
-            let res = if q.len() == 1 {
-                &v[q[0]]
-            } else {
-                &v[q[0]][q[1]]
-            }.to_string();
+            let res = q.get(&v).unwrap().to_string();
             r += res.len();
             if print {
                 println!("{}", res);
             }
         }
         r
+    }
+}
+
+struct Query<'a> {
+    inner: Vec<&'a str>,
+}
+
+impl<'a> Query<'a> {
+    fn from_slice(q: &'a [u8]) -> Result<Self, str::Utf8Error> {
+        for i in 2..q.len() {
+            if q[i] == 0x2e {
+                return Ok(Query {
+                    inner: vec![
+                        str::from_utf8(&q[2..i])?,
+                        str::from_utf8(&q[i + 1..q.len()])?,
+                    ],
+                });
+            }
+        }
+        Ok(Query {
+            inner: vec![str::from_utf8(&q[2..q.len()])?],
+        })
+    }
+
+    fn get<'v>(&self, v: &'v JsonValue) -> Option<&'v JsonValue> {
+        if self.inner.len() == 1 {
+            Some(&v[self.inner[0]])
+        } else {
+            Some(&v[self.inner[0]][self.inner[1]])
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Query;
+
+    #[test]
+    fn test_query_case1() {
+        let q = "$._id.$oid";
+        let Query { inner } = Query::from_slice(q.as_bytes()).unwrap();
+        assert_eq!(inner, vec!["_id", "$oid"]);
     }
 }
