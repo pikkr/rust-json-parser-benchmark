@@ -1,5 +1,6 @@
 #![feature(fn_must_use)]
 
+#[cfg_attr(test, macro_use)]
 extern crate json;
 extern crate pikkr;
 extern crate serde;
