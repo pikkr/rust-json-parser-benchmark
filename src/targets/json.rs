@@ -73,49 +73,34 @@ impl<'a> Query<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::Query;
+    use super::{JsonParser, Query};
     use json::JsonValue;
 
     #[test]
-    fn test_query_case1() {
+    fn test_query() {
         let q = "$._id.$oid";
         let Query { inner } = Query::from_str(q).unwrap();
         assert_eq!(inner, vec!["_id", "$oid"]);
     }
 
     #[test]
-    fn test_query_case2() {
+    fn test_invalid_query() {
         assert!(Query::from_str("$.").is_err());
     }
 
     #[test]
     fn test_query_get() {
         let v = object!{
-            "_id" => object!{
-                "$oid" => "foo"
-            }
+            "_id" => object!{ "$oid" => "foo" }
         };
         let q = Query::from_str("$._id.$oid").unwrap();
         assert_eq!(q.get(&v), Some(&JsonValue::from("foo")));
     }
 
     #[test]
-    fn test_query_get2() {
+    fn test_query_get_object() {
         let v = object!{
-            "_id" => object!{
-                "$oid" => "foo"
-            }
-        };
-        let q = Query::from_str("$._id.$oid.missing").unwrap();
-        assert_eq!(q.get(&v), None);
-    }
-
-    #[test]
-    fn test_query_get3() {
-        let v = object!{
-            "_id" => object!{
-                "$oid" => "foo"
-            }
+            "_id" => object!{ "$oid" => "foo" }
         };
         let q = Query::from_str("$._id").unwrap();
         assert_eq!(q.get(&v), Some(&object!{ "$oid" => "foo" }));
@@ -124,11 +109,58 @@ mod tests {
     #[test]
     fn test_query_get_missing() {
         let v = object!{
-            "_id" => object!{
-                "$oid" => "foo"
-            }
+            "_id" => object!{ "$oid" => "foo" }
         };
         let q = Query::from_str("$.missing").unwrap();
         assert_eq!(q.get(&v), None);
+    }
+
+    #[test]
+    fn test_query_get_missing_nested() {
+        let v = object!{
+            "_id" => object!{ "$oid" => "foo" }
+        };
+        let q = Query::from_str("$._id.$oid.missing").unwrap();
+        assert_eq!(q.get(&v), None);
+    }
+
+
+    const JSON: &str = r#"{
+                              "_id": {"$oid": "52cdef7c4bab8bd675297d8a"},
+                              "total_money_raised": "$39.8M"
+                          }"#;
+
+    #[test]
+    fn test_strings() {
+        let paths = &["$._id.$oid", "$.total_money_raised"];
+        let expected = vec![
+            Some(JsonValue::from("52cdef7c4bab8bd675297d8a")),
+            Some(JsonValue::from("$39.8M")),
+        ];
+        assert_eq!(JsonParser::new(paths).unwrap()._parse(JSON), expected);
+    }
+
+    #[test]
+    fn test_object() {
+        let paths = &["$._id"];
+        let expected = vec![Some(object!{ "$oid" => "52cdef7c4bab8bd675297d8a" })];
+        assert_eq!(JsonParser::new(paths).unwrap()._parse(JSON), expected);
+    }
+
+    #[test]
+    fn test_nested() {
+        let paths = &["$._id", "$._id.$oid"];
+        let expected = vec![
+            Some(object!{ "$oid" => "52cdef7c4bab8bd675297d8a" }),
+            Some(JsonValue::from("52cdef7c4bab8bd675297d8a")),
+        ];
+        assert_eq!(JsonParser::new(paths).unwrap()._parse(JSON), expected);
+    }
+
+    #[test]
+    fn test_missing() {
+        let paths = &["$.missing"];
+        let expected = vec![None];
+        assert_eq!(JsonParser::new(paths).unwrap()._parse(JSON), expected);
     }
 }
