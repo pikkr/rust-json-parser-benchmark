@@ -6,6 +6,6 @@ authors = ["Keiji Yoshida <kjmrknsn@gmail.com>"]
 [dependencies]
 json = "0.11.9"
 linear-map = "1.2.0"
-pikkr = "0.14.0"
+pikkr = "0.16.0"
 serde = "1.0.11"
 serde_json = "1.0.2"
